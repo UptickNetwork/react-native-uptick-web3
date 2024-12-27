@@ -1,0 +1,42 @@
+{
+  "name": "@uptickjs/react-native-uptick-web3",
+  "version": "1.0.0",
+  "author": "Uptick Dev Team",
+  "description": "Uptick ReactNative SDK",
+  "private": false,
+  "license": "GPL-3.0",
+  "files": [
+    "src"
+  ],
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/UptickNetwork/react-native-uptick-web3"
+    },
+  "dependencies": {
+    "web3": "^1.10.0",
+	"ethers": "^6.11.1",
+	"bip39": "^3.0.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+   
+  }
+}
+
+
+
