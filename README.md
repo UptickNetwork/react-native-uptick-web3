@@ -1,10 +1,6 @@
 # uptickChainAppReactNative
 
 
-React Native uptick web3 SDK 是一款专为 React Native 开发语言打造的web3交互工具，其旨在极大地简化用户与您的去中心化应用（Dapp）建立连接的流程，并高效地实现与区块链的交互操作。
-
-借助这一 SDK，开发者能够轻松完成对 NFT 的多项操作，包括但不限于发布合约、创建资产、转移资产等，同时还支持多种创新的销售模式，如常规上架、优惠上架以及货品卡发布等多样化形式，全方位满足不同业务场景需求。不仅如此，通过使用 uptick api 服务[](https://docs.services.uptick.network/5449703m0)，Dapp 的开发过程将得到进一步的优化与简化，该 API 服务提供了从 NFT 创建直至市场销售的全流程完整功能支持，为开发者构建功能丰富、体验卓越的 Dapp 提供了坚实有力的技术支撑，助力其在区块链应用开发领域脱颖而出，快速实现业务价值。
-
 The React Native uptick web3 SDK is a web3 interaction tool specifically designed for the React Native programming language. It aims to greatly simplify the process for users to connect to your decentralized application (Dapp) and efficiently perform interaction operations with the blockchain.
 
 With the help of this SDK, developers can easily complete multiple operations on NFTs, including but not limited to publishing contracts, creating assets, and transferring assets. Meanwhile, it also supports various innovative sales models, such as regular listing, preferential listing, and product card release, etc., fully meeting the needs of different business scenarios. Moreover, by using the uptick API service [](https://docs.services.uptick.network/5449703m0), the development process of Dapps will be further optimized and simplified. This API service provides complete functionality support for the whole process from NFT creation to marketplace sales, offering solid and powerful technical support for developers to build Dapps with rich features and excellent user experience, helping them stand out in the field of blockchain application development and quickly realize business value.
