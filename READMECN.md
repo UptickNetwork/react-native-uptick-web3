@@ -5,12 +5,8 @@ React Native uptick web3 SDK 是一款专为 React Native 开发语言打造的w
 
 借助这一 SDK，开发者能够轻松完成对 NFT 的多项操作，包括但不限于发布合约、创建资产、转移资产等，同时还支持多种创新的销售模式，如常规上架、优惠上架以及货品卡发布等多样化形式，全方位满足不同业务场景需求。不仅如此，通过使用 uptick api 服务[](https://docs.services.uptick.network/5449703m0)，Dapp 的开发过程将得到进一步的优化与简化，该 API 服务提供了从 NFT 创建直至市场销售的全流程完整功能支持，为开发者构建功能丰富、体验卓越的 Dapp 提供了坚实有力的技术支撑，助力其在区块链应用开发领域脱颖而出，快速实现业务价值。
 
-The React Native uptick web3 SDK is a web3 interaction tool specifically designed for the React Native programming language. It aims to greatly simplify the process for users to connect to your decentralized application (Dapp) and efficiently perform interaction operations with the blockchain.
 
-With the help of this SDK, developers can easily complete multiple operations on NFTs, including but not limited to publishing contracts, creating assets, and transferring assets. Meanwhile, it also supports various innovative sales models, such as regular listing, preferential listing, and product card release, etc., fully meeting the needs of different business scenarios. Moreover, by using the uptick API service [](https://docs.services.uptick.network/5449703m0), the development process of Dapps will be further optimized and simplified. This API service provides complete functionality support for the whole process from NFT creation to marketplace sales, offering solid and powerful technical support for developers to build Dapps with rich features and excellent user experience, helping them stand out in the field of blockchain application development and quickly realize business value.
-
-
-## Installation of the SDK
+## 安装SDK
 
 To install with Yarn, run:
 ```
@@ -21,9 +17,9 @@ To install with NPM, run:
 npm install @uptickjs/react-native-uptick-web3
 ```
 
-## Initialization of web3
+## web3初始化
 
-Execute this before sending transactions using WEB3.
+在使用WEB3发送交易前执行
 
 ```
 import {utils, getWeb3Instance} from './web3Util';
@@ -31,7 +27,7 @@ const web3 = getWeb3Instance();
 
 ```
 
-The method for initializing web3:
+初始化web3方法
 
 ```
 const web3 = new Web3('https://json-rpc.uptick.network');
@@ -47,9 +43,9 @@ export const setProvider = (provider: string) => {
 ```
 
 
-## Introduction to Methods
+## 方法介绍
 
-Create a Wallet
+创建钱包
 ```
 import * as bip39 from 'bip39';
 import {
@@ -59,7 +55,7 @@ import {
   let mnemonic = bip39.generateMnemonic();
   const wallet = importWallet(mnemonic);
 ```
-Import a Wallet
+导入钱包
 ```
 import * as bip39 from 'bip39';
 import {
@@ -76,7 +72,7 @@ import {
 ```
 
 
-Convert between EVM Address and Uptick Address
+Evm地址Uptick地址相互转换
 ```
 uptickAddress2EVM(address)
 
@@ -86,7 +82,7 @@ Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
 address  | String | 用户地址
 
-Get Balance
+获取余额
 ```
  getBalance = (
   address: string,
@@ -98,7 +94,7 @@ Params     |  Parameter type  | Parameter description
 address  | String | 用户地址
 rpcUrl  | String | JsonRpcURL
 
-Create a Contract
+创建合约
 ```
 deploy()
   
@@ -112,8 +108,7 @@ name  | String | true | 合约名字
 metadataUrl  | String | false | metadata信息
 lazySignAddress  | String | false | 签名地址，用于mint资产时验证签名
 
-Create Assets
-
+创建资产
 ```
 mintNft()
 ```
@@ -127,8 +122,7 @@ metaDataUrl  | String | true | metadata信息
 royaltyPercentage  | String | true | 分成比例
 amountValue  | Number | false | 数量
 
-Transfer Assets
-
+资产转送
 ```
 NftTransfer()
 ```
@@ -141,7 +135,7 @@ nftAddress  | String | nft合约地址
 nftType  | String | nft类型
 amount  | Number  | 转送数量
 
-Regular Sales Listing of Assets
+资产普通销售上架
 ```
 nftOnsale()
 
@@ -158,8 +152,7 @@ plateFromAddress  | string  | 销售合约地址
 nftType  | String | nft类型
 nftTokenIds  | String | 多个NFTid
 
-Preferential Sales Listing of Assets
-
+资产优惠销售上架
 ```
 couponOnSale()
 
@@ -177,8 +170,7 @@ couponCode  | String | 优惠码
 reducedPrice | Number | 优惠价格
 
 
-Auction Listing of Assets
-
+资产拍卖上架
 ```
 createAuction()
 ```
@@ -196,8 +188,7 @@ fee  | Number | 手续费
 amount  | Number  | 上架数量
 payAddress  | String  | 上架币种合约地址
 
-Auction Bidding
-
+拍卖竞价
 ```
 auction_placeBid()
 ```
@@ -212,8 +203,7 @@ owner  | String  | 售卖者地址
 fromAddress  | String  | 竞拍者地址
 marketAddress  | String  | 销售合约地址
 
-Remove Assets from Listing
-
+资产下架
 ```
 offSale()
 ```
@@ -227,8 +217,7 @@ nftType  | String | nft类型
 nftTokenIds  | String | nftId列表
 
 
-Withdraw from Auction
-
+拍卖撤回
 ```
 auction_end()
 ```
@@ -239,7 +228,7 @@ nftAddress  | String | nft合约地址
 nftid  | String | nftid
 owner  | String  | ERC1155类型，需要上架者地址
 
-Purchase Assets
+购买资产
 ```
 NftPayOrder()
 ```
@@ -255,8 +244,7 @@ couponCode  | String  | 优惠码，没有就填‘0’
 couponLink  | String  | couponLink，没有就填‘0’
 payAddress  | String  | 支付币种合约地址
 
-Place an Offer
-
+出价
 ```
 createOffer()
 
@@ -272,8 +260,7 @@ payAddress  | String | 支付币种合约地址
 payAmount  | Number | 出价金额
 expiry | String | 出价有效期
 
-Cancel an Offer
-
+取消出价
 ```
 cancelOffer()
 
@@ -284,11 +271,14 @@ plateFromAddress  | String | plateFromAddress
 nftType  | String | nft类型
 offerNumber  | String | 出价号码(随机数)
 
-Accept an Offer
-
+接受出价
 ```
 acceptOffer()
-
+ platformAddress,
+  nftType,
+  offerNumber,
+  nftAddress,
+  tokenId,
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
@@ -299,7 +289,7 @@ nftAddress  | String | nft合约地址
 nftid  | String | nftid
 
 
-Query Cross-Chain Handling Fees
+查询跨链手续费
 ```
 getFeeByChainID()
 ```
@@ -309,7 +299,7 @@ tokenIds  | Array | tokenid
 chainId  | Number | 链chainid
 
 
-Cross-Chain Transfer of Assets (supporting Uptick, Polygon, Arbitrum, BSC)
+资产跨链，支持Uptick\Polygon\Arbitrum\BSC 
 ```
 uptickToEVM()
 
@@ -321,7 +311,8 @@ toAddress  | String | 接受地址
 metadate  | String | metadate信息
 plateFromAddress  | String | 跨链合约地址
 
+## example
 
-## Problem Reporting
+## issues报告
 
 https://github.com/UptickNetwork/react-native-uptick-web3/issues
