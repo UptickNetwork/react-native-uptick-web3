@@ -1,12 +1,290 @@
 import Web3 from 'web3';
 import * as bip39 from 'bip39';
-import {ethers} from 'ethers';
-import {abi as ERC20ABI} from './abi/IERC20.json';
-import {toWords0, encode0, bech32, fromWords0} from './bech32';
-import {resolve} from 'url';
+import { ethers } from 'ethers';
+import { abi as ERC20ABI } from './abi/IERC20.json';
+import { toWords0, encode0, bech32, fromWords0 } from './bech32';
+import { resolve } from 'url';
+import Web3Auth, {
+  LOGIN_PROVIDER,
+  OPENLOGIN_NETWORK,
+} from '@web3auth/react-native-sdk';
+import * as WebBrowser from '@toruslabs/react-native-web-browser';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 // TODO: change it on chain change (setProvider?)
 const web3 = new Web3('https://json-rpc.uptick.network');
+let web3authObj;
+
+export const initWeb3Auth = (
+  resolvedRedirectUrl,
+  clientId,
+  appName,
+  logoLight,
+  logoDark
+) => {
+  const web3auth = new Web3Auth(WebBrowser, EncryptedStorage, {
+    clientId,
+    network: OPENLOGIN_NETWORK.SAPPHIRE_DEVNET, // or other networks
+    whiteLabel: {
+      appName: appName,
+      logoLight: logoLight,
+      logoDark: logoDark,
+      defaultLanguage: 'en',
+      mode: 'auto', // or "dark" or "light"
+      theme: {
+        primary: '#cddc39',
+      },
+    },
+  });
+  web3authObj = {
+    web3auth: web3auth,
+    resolvedRedirectUrl: resolvedRedirectUrl,
+  };
+};
+
+// google
+export const GoogleLogin = async () => {
+  console.log('wxl ---- GoogleLogin');
+
+  let googleLoginResult;
+  try {
+    await web3authObj.web3auth.init();
+
+    if (web3authObj.web3auth.privKey) {
+      console.log(web3authObj.web3auth.privKey);
+      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
+      // setProvider(ethereumPrivateKeyProvider);
+      // uiConsole('Logged In');
+      // setLoggedIn(true);
+    }
+
+    if (!web3authObj.web3auth.ready) {
+      googleLoginResult = {
+        msg: 'Web3auth not initialized',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+    let result = await checkGoogle();
+    if (result) {
+      let response = await web3authObj.web3auth.login({
+        loginProvider: LOGIN_PROVIDER.GOOGLE,
+        redirectUrl: web3authObj.resolvedRedirectUrl,
+      });
+      if (web3authObj.web3auth.privKey) {
+        // console.log("web3auth.privKey",web3auth.privKey)
+        let userInfo = await web3authObj.web3auth.userInfo();
+        console.log('web3 userInfo', userInfo);
+
+        if (userInfo && userInfo.name) {
+          googleLoginResult = {
+            privateKey: web3authObj.web3auth.privKey,
+            userInfo: userInfo,
+            success: true,
+          };
+        }
+
+        web3authObj.web3auth.logout();
+        return googleLoginResult;
+      }
+    } else {
+      googleLoginResult = {
+        msg: 'create.errors.logiinError',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+    //   .then((result) => {
+    //     console.log('result=====', result);
+    //     if (result) {
+    //       console.log('Logging in start');
+    //       web3authObj.web3auth
+    //         .login({
+    //           loginProvider: LOGIN_PROVIDER.GOOGLE,
+    //           redirectUrl: web3authObj.resolvedRedirectUrl,
+    //         })
+    //         .then((response) => {
+    //           console.log('loginGoogle in  end0000');
+    //           if (web3authObj.web3auth.privKey) {
+    //             // console.log("web3auth.privKey",web3auth.privKey)
+    //             let userInfo = web3auth.userInfo();
+    //             console.log('web3 userInfo', userInfo);
+
+    //             if (userInfo && userInfo.name) {
+    //               googleLoginResult = {
+    //                 privateKey: web3authObj.web3auth.privKey,
+    //                 userInfo: userInfo,
+    //                 success:true
+    //               };
+    //             }
+
+    //             web3authObj.web3auth.logout();
+    //             return googleLoginResult;
+    //           }
+    //         })
+    //         .catch((error: any) => {
+    //            googleLoginResult = {
+    //                msg:error.message,
+    //                 success:false
+    //               };
+    //   return googleLoginResult;
+
+    //         });
+    //     } else {
+    //       googleLoginResult = {
+
+    //                msg:'create.errors.logiinError',
+    //                 success:false
+    //               };
+    //   return googleLoginResult;
+
+    //     }
+    //   })
+    //   .catch(console.error);
+  } catch (e: any) {
+    console.log(e.message);
+  }
+};
+
+// Email
+
+export const EmailLogin = async (email) => {
+  console.log('wxl ---- EmailLogin', email);
+
+  let googleLoginResult;
+  try {
+    await web3authObj.web3auth.init();
+
+    if (web3authObj.web3auth.privKey) {
+      console.log(web3authObj.web3auth.privKey);
+      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
+      // setProvider(ethereumPrivateKeyProvider);
+      // uiConsole('Logged In');
+      // setLoggedIn(true);
+    }
+
+    if (!web3authObj.web3auth.ready) {
+      googleLoginResult = {
+        msg: 'Web3auth not initialized',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+    let result = await checkGoogle();
+    if (result) {
+      let response = await web3authObj.web3auth.login({
+        loginProvider: LOGIN_PROVIDER.EMAIL_PASSWORDLESS,
+        redirectUrl: web3authObj.resolvedRedirectUrl,
+        extraLoginOptions: {
+          login_hint: email,
+        },
+      });
+
+      if (web3authObj.web3auth.privKey) {
+        // console.log("web3auth.privKey",web3auth.privKey)
+        let userInfo = await web3authObj.web3auth.userInfo();
+        console.log('web3 userInfo', userInfo);
+
+        if (userInfo && userInfo.name) {
+          googleLoginResult = {
+            privateKey: web3authObj.web3auth.privKey,
+            userInfo: userInfo,
+            success: true,
+          };
+        }
+
+        web3authObj.web3auth.logout();
+        return googleLoginResult;
+      }
+    } else {
+      googleLoginResult = {
+        msg: 'create.errors.logiinError',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+  } catch (e: any) {
+    console.log(e.message);
+  }
+};
+export const AppleLogin = async () => {
+  console.log('wxl ---- AppleLogin');
+
+  let googleLoginResult;
+  try {
+    await web3authObj.web3auth.init();
+
+    if (web3authObj.web3auth.privKey) {
+      console.log(web3authObj.web3auth.privKey);
+      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
+      // setProvider(ethereumPrivateKeyProvider);
+      // uiConsole('Logged In');
+      // setLoggedIn(true);
+    }
+
+    if (!web3authObj.web3auth.ready) {
+      googleLoginResult = {
+        msg: 'Web3auth not initialized',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+    let result = await checkGoogle();
+    if (result) {
+      let response = await web3authObj.web3auth.login({
+        loginProvider: LOGIN_PROVIDER.APPLE,
+        redirectUrl: web3authObj.resolvedRedirectUrl,
+      });
+
+      if (web3authObj.web3auth.privKey) {
+        // console.log("web3auth.privKey",web3auth.privKey)
+        let userInfo = await web3authObj.web3auth.userInfo();
+        console.log('web3 userInfo', userInfo);
+
+        if (userInfo && userInfo.name) {
+          googleLoginResult = {
+            privateKey: web3authObj.web3auth.privKey,
+            userInfo: userInfo,
+            success: true,
+          };
+        }
+
+        web3authObj.web3auth.logout();
+        return googleLoginResult;
+      }
+    } else {
+      googleLoginResult = {
+        msg: 'create.errors.logiinError',
+        success: false,
+      };
+      return googleLoginResult;
+    }
+  } catch (e: any) {
+    console.log(e.message);
+  }
+};
+
+const timeout = 10000; // 10秒
+const checkGoogle = () => {
+  return Promise.race([
+    fetch('https://www.google.com'),
+    new Promise((resolve, reject) =>
+      setTimeout(() => reject(new Error('Timeout')), timeout)
+    ),
+  ])
+    .then((response) => {
+      if (!response.ok) {
+        console.log('jianceshib');
+
+        return false;
+      }
+
+      return true;
+    })
+    .catch((error) => {
+      return false;
+    });
+};
 
 export const getWeb3Instance = () => {
   return web3;
@@ -37,7 +315,7 @@ export const importWallet = (mnemonic: string) => {
     } else {
       wallet = ethers.HDNodeWallet.fromMnemonic(
         ethers.Mnemonic.fromPhrase(mnemonic),
-        eth_path,
+        eth_path
       );
     }
     if (!wallet.address) {
@@ -80,7 +358,7 @@ export const getHDWallet = (index: number, mnemonic: string) => {
     const eth_path = `m/44'/60'/0'/0/${index}`;
     let wallet = ethers.HDNodeWallet.fromMnemonic(
       ethers.Mnemonic.fromPhrase(mnemonic),
-      eth_path,
+      eth_path
     );
 
     const address = wallet.address;
@@ -129,7 +407,7 @@ export const getAccounts = () => {
   return new Promise((resolve, reject) => {
     web3.eth
       .getAccounts()
-      .then(accounts => {
+      .then((accounts) => {
         resolve(accounts);
       })
       .catch((error: any) => {
@@ -141,13 +419,13 @@ export const getAccounts = () => {
 
 export const getBalance = (
   address: string,
-  rpcUrl: string,
+  rpcUrl: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     setProvider(rpcUrl);
     web3.eth
       .getBalance(address)
-      .then(balance => {
+      .then((balance) => {
         console.log(address, '查询基础余额结果是' + balance);
         resolve(web3.utils.fromWei(balance, 'ether'));
       })
@@ -163,7 +441,7 @@ export const checkRpcAvalible = (rpc: string): Promise<string> => {
     setProvider(rpc);
     web3.eth
       .getChainId()
-      .then(chainId => {
+      .then((chainId) => {
         console.log('testRpcAvalible===', rpc, chainId);
         resolve(chainId);
       })
@@ -177,7 +455,7 @@ export const checkRpcAvalible = (rpc: string): Promise<string> => {
 
 export const getERC20Balance = (
   address: string,
-  contractAddress: string,
+  contractAddress: string
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
@@ -197,7 +475,7 @@ export const Token20Transfer = (
   from: string,
   to: string,
   contractAddress: string,
-  amount: number,
+  amount: number
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
   const transferTx = contract.methods
@@ -210,7 +488,7 @@ export const Token20Transfer = (
 export const token20ApprovalForAll = (
   platFromAddress: string,
   contractAddress: string,
-  amount: number,
+  amount: number
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
   const transferTx = contract.methods
@@ -224,7 +502,7 @@ export const check20ApprovalForAll = (
   from: string,
   platFromAddress: string,
   contractAddress: string,
-  amount: number,
+  amount: number
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
   const transferTx = contract.methods
@@ -277,7 +555,7 @@ export const signTypedDataMessage = (
   types: Record<string, Array<TypedDataField>>,
   value: Record<string, any>,
   privateKey: string,
-  rpcUrl: string,
+  rpcUrl: string
 ) => {
   return new Promise((resolve, reject) => {
     let httpProvider = new ethers.JsonRpcProvider(rpcUrl);
@@ -377,7 +655,7 @@ export const getNonce = (address: string) => {
 
 export const getBlock = (
   blockNumber: any,
-  returnTransactionObjects: boolean,
+  returnTransactionObjects: boolean
 ) => {
   return new Promise((resolve, reject) => {
     web3.eth
@@ -436,7 +714,7 @@ export const getTransactionInBlock = (blockNumber: number, index: number) => {
 
 export const recoverPersonalSignature = (
   message: string,
-  signature: string,
+  signature: string
 ) => {
   try {
     const recoveredAddress = ethers.utils.verifyMessage(message, signature);
@@ -450,7 +728,7 @@ export const recoverPersonalSignature = (
 export const createAccount = async (
   name: string,
   index: number,
-  mnemonic: string,
+  mnemonic: string
 ) => {
   try {
     let HDWallet = getHDWallet(index, mnemonic);
@@ -554,7 +832,7 @@ export const token2fromwei = (tokenNum: string, demical: number) => {
         tokenNum = Math.round(Number(tokenNum)).toString();
       }
       return parseFloat(
-        Number(web3.utils.fromWei(tokenNum, 'ether')).toFixed(6),
+        Number(web3.utils.fromWei(tokenNum, 'ether')).toFixed(6)
       );
     }
   } else {

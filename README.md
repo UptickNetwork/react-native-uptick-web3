@@ -5,6 +5,14 @@ The React Native uptick web3 SDK is a web3 interaction tool specifically designe
 
 With the help of this SDK, developers can easily complete multiple operations on NFTs, including but not limited to publishing contracts, creating assets, and transferring assets. Meanwhile, it also supports various innovative sales models, such as regular listing, preferential listing, and product card release, etc., fully meeting the needs of different business scenarios. Moreover, by using the uptick API service [](https://docs.services.uptick.network/5449703m0), the development process of Dapps will be further optimized and simplified. This API service provides complete functionality support for the whole process from NFT creation to marketplace sales, offering solid and powerful technical support for developers to build Dapps with rich features and excellent user experience, helping them stand out in the field of blockchain application development and quickly realize business value.
 
+The SDK also integrates convenient third-party login features that support:
+
+Email login: Use email verification code to securely log in
+Google Sign-in: Support one-click login with Google account
+Apple Login: Support iOS devices to quickly sign in with Apple ID
+
+Before using the third-party login function, developers need to go to the Web3Auth official website before they can use the third-party login function in the SDK normally.
+
 
 ## Installation of the SDK
 
@@ -50,7 +58,7 @@ Create a Wallet
 import * as bip39 from 'bip39';
 import {
   importWallet,
-} from '@xyyz1207/react-native-uptick-web3/src/web3Util';
+} from '@uptickjs/react-native-uptick-web3/src/web3Util';
 
   let mnemonic = bip39.generateMnemonic();
   const wallet = importWallet(mnemonic);
@@ -61,7 +69,7 @@ import * as bip39 from 'bip39';
 import {
   validateMnemonic,
   importWallet,
-} from '@xyyz1207/react-native-uptick-web3/src/web3Util';
+} from '@uptickjs/react-native-uptick-web3/src/web3Util';
 
 // Import wallet with mnemonic
       if (validateMnemonic(mnemonic.trimStart().trimEnd())) {
@@ -70,6 +78,66 @@ import {
 // Import wallet with privatekey	  
 	 const wallet = importWallet(privatekey);  
 ```
+Third-party login initialization
+```
+import {
+  initWeb3Auth,
+  GoogleLogin,
+  EmailLogin,
+  AppleLogin,
+} from '@uptickjs/react-native-uptick-web3/src/web3Util';
+
+// init web3AuthObj
+ let web3AuthObj = initWeb3Auth(
+      resolvedRedirectUrl,
+      clientId,
+      appName,
+      logoLight,
+      logoDark,
+    );
+```
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+resolvedRedirectUrl  | String | 配置允许的域名和重定向地址
+clientId  | String | 项目clientId
+appName  | String | App包名
+logoLight  | String | light模式项目logo
+logoDark  | String | dark模式项目logo
+
+Email login
+```
+EmailLogin(email)
+```
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+email  | String | 邮箱地址
+
+Returns results
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
+Google login
+```
+GoogleLogin()
+```
+Returns results
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
+Apple login
+```
+AppleLogin()
+```
+Returns results
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
 
 
 Convert between EVM Address and Uptick Address

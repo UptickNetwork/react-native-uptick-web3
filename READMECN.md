@@ -5,6 +5,14 @@ React Native uptick web3 SDK 是一款专为 React Native 开发语言打造的w
 
 借助这一 SDK，开发者能够轻松完成对 NFT 的多项操作，包括但不限于发布合约、创建资产、转移资产等，同时还支持多种创新的销售模式，如常规上架、优惠上架以及货品卡发布等多样化形式，全方位满足不同业务场景需求。不仅如此，通过使用 uptick api 服务[](https://docs.services.uptick.network/5449703m0)，Dapp 的开发过程将得到进一步的优化与简化，该 API 服务提供了从 NFT 创建直至市场销售的全流程完整功能支持，为开发者构建功能丰富、体验卓越的 Dapp 提供了坚实有力的技术支撑，助力其在区块链应用开发领域脱颖而出，快速实现业务价值。
 
+SDK还集成了便捷的第三方登录功能，支持：
+- 邮箱登录：通过邮箱验证码实现安全登录
+- Google登录：支持Google账号一键登录
+- Apple登录：支持iOS设备使用Apple ID快速登录
+
+在使用第三方登录功能前，开发者需要先在 [Web3Auth 官网](https://web3auth.io/),这些配置完成后，才能正常使用 SDK 中的第三方登录功能。
+
+
 
 ## 安装SDK
 
@@ -70,6 +78,67 @@ import {
 // Import wallet with privatekey	  
 	 const wallet = importWallet(privatekey);  
 ```
+第三方登录初始化
+```
+import {
+  initWeb3Auth,
+  GoogleLogin,
+  EmailLogin,
+  AppleLogin,
+} from '@xyyz1207/react-native-uptick-web3/src/web3Util';
+
+// init web3AuthObj
+ let web3AuthObj = initWeb3Auth(
+      resolvedRedirectUrl,
+      clientId,
+      appName,
+      logoLight,
+      logoDark,
+    );
+```
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+resolvedRedirectUrl  | String | 配置允许的域名和重定向地址
+clientId  | String | 项目clientId
+appName  | String | App包名
+logoLight  | String | light模式项目logo
+logoDark  | String | dark模式项目logo
+
+邮箱登录
+```
+EmailLogin(email)
+```
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+email  | String | 邮箱地址
+
+返回结果
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
+Google登录
+```
+GoogleLogin()
+```
+返回结果
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
+Apple登录
+```
+AppleLogin()
+```
+返回结果
+Params     |  Parameter type  | Parameter description
+:---: | :---: | :---:
+privateKey  | String | 钱包地址私钥
+userInfo  | Object | 用户基础信息
+
+
 
 
 Evm地址Uptick地址相互转换
@@ -316,3 +385,5 @@ plateFromAddress  | String | 跨链合约地址
 ## issues报告
 
 https://github.com/UptickNetwork/react-native-uptick-web3/issues
+
+

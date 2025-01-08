@@ -1,6 +1,6 @@
 {
-  "name": "@uptickjs/react-native-uptick-web3",
-  "version": "1.0.0",
+  "name": "@xyyz1207/react-native-uptick-web3",
+  "version": "1.0.3",
   "author": "Uptick Dev Team",
   "description": "Uptick ReactNative SDK",
   "private": false,
@@ -8,14 +8,17 @@
   "files": [
     "src"
   ],
-   "repository": {
-      "type": "git",
-      "url": "https://github.com/UptickNetwork/react-native-uptick-web3"
-    },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UptickNetwork/react-native-uptick-web3"
+  },
   "dependencies": {
-    "web3": "^1.10.0",
-	"ethers": "^6.11.1",
-	"bip39": "^3.0.4"
+    "@toruslabs/react-native-web-browser": "^1.1.0",
+    "@web3auth/react-native-sdk": "5.1.0",
+    "bip39": "^3.0.4",
+    "ethers": "^6.11.1",
+    "react-native-encrypted-storage": "^4.0.3",
+    "web3": "^1.10.0"
   },
   "publishConfig": {
     "access": "public",
@@ -33,10 +36,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-   
-  }
+  "devDependencies": {}
 }
-
-
-
