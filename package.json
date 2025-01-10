@@ -1,6 +1,6 @@
 {
-  "name": "@xyyz1207/react-native-uptick-web3",
-  "version": "1.0.3",
+  "name": "@uptickjs/react-native-uptick-web3",
+  "version": "1.0.1",
   "author": "Uptick Dev Team",
   "description": "Uptick ReactNative SDK",
   "private": false,
