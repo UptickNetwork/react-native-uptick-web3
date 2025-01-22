@@ -98,11 +98,11 @@ import {
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-resolvedRedirectUrl  | String | 配置允许的域名和重定向地址
-clientId  | String | 项目clientId
-appName  | String | App包名
-logoLight  | String | light模式项目logo
-logoDark  | String | dark模式项目logo
+resolvedRedirectUrl  | String | schema
+clientId  | String | web3auth clientId
+appName  | String | App Package Name
+logoLight  | String | light logo
+logoDark  | String | dark logo
 
 Email login
 ```
@@ -110,13 +110,13 @@ EmailLogin(email)
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-email  | String | 邮箱地址
+email  | String | Email
 
 Returns results
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-privateKey  | String | 钱包地址私钥
-userInfo  | Object | 用户基础信息
+privateKey  | String | Wallet Private Key
+userInfo  | Object | User information
 
 Google login
 ```
@@ -125,8 +125,8 @@ GoogleLogin()
 Returns results
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-privateKey  | String | 钱包地址私钥
-userInfo  | Object | 用户基础信息
+privateKey  | String | Wallet Private Key
+userInfo  | Object | User information
 
 Apple login
 ```
@@ -135,8 +135,8 @@ AppleLogin()
 Returns results
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-privateKey  | String | 钱包地址私钥
-userInfo  | Object | 用户基础信息
+privateKey  | String | Wallet Private Key
+userInfo  | Object | User information
 
 
 
@@ -148,7 +148,7 @@ evmAddress2UptickAddress(address)
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-address  | String | 用户地址
+address  | String | Address
 
 Get Balance
 ```
@@ -159,7 +159,7 @@ Get Balance
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---:
-address  | String | 用户地址
+address  | String | Address
 rpcUrl  | String | JsonRpcURL
 
 Create a Contract
@@ -169,12 +169,12 @@ deploy()
 ```
 Params     |  Parameter type     |  Require  | Parameter description
 :---: | :---: | :---: | :---:
-nftType  | String | true| nft类型
+nftType  | String | true| nft type
 privateKey  | String | true| privateKey
 gasPrice  | Number | true| gasPrice
-name  | String | true | 合约名字
-metadataUrl  | String | false | metadata信息
-lazySignAddress  | String | false | 签名地址，用于mint资产时验证签名
+name  | String | true | contract name
+metadataUrl  | String | false | Metadata information
+lazySignAddress  | String | false | signature address, used to verify signature when minting assets
 
 Create Assets
 
@@ -183,13 +183,13 @@ mintNft()
 ```
 Params     |  Parameter type     |  Require  | Parameter description
 :---: | :---: | :---: | :---:
-nftType  | String | true| nft类型
-toAddress  | String | true | 接收地址
-nftAddress  | String | nft合约地址
+nftType  | String | true| nft type
+toAddress  | String | true | Receiving address
+nftAddress  | String | true | nft contract address
 nftId  | String | true | nftId
-metaDataUrl  | String | true | metadata信息
-royaltyPercentage  | String | true | 分成比例
-amountValue  | Number | false | 数量
+metaDataUrl  | String | true | Metadata information
+royaltyPercentage  | String | true | Share ratio
+amountValue  | Number | false | amount
 
 Transfer Assets
 
@@ -198,12 +198,12 @@ NftTransfer()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-from  | String | 转出类型
-to  | String | 接收地址
+from  | String | Transfer out address
+to  | String | Receiving address
 nftId  | String | nftId
-nftAddress  | String | nft合约地址
-nftType  | String | nft类型
-amount  | Number  | 转送数量
+nftAddress  | String | nft contract address
+nftType  | String | nft type
+amount  | Number  | amount
 
 Regular Sales Listing of Assets
 ```
@@ -213,14 +213,14 @@ nftOnsale()
 
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftAddress  | String | nft合约地址
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-price  | Array | 上架价格
-tokenAddress  | Array  | 上架币种合约地址
-amount  | string  | 上架数量
-plateFromAddress  | string  | 销售合约地址
-nftType  | String | nft类型
-nftTokenIds  | String | 多个NFTid
+price  | Array | Listing price
+tokenAddress  | Array  | The token contract address for selling your NFT
+amount  | string  | listing quantity
+plateFromAddress  | string  | Bidder address
+nftType  | String | nft type
+nftTokenIds  | String | Multiple nftIDs
 
 Preferential Sales Listing of Assets
 
@@ -230,15 +230,15 @@ couponOnSale()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftAddress  | String | nft合约地址
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-price  | String | 上架价格
-tokenAddress  | String  | 上架币种合约地址
-amount  | Number  | 上架数量
-plateFromAddress  | string  | 销售合约地址
-nftType  | String | nft类型
-couponCode  | String | 优惠码
-reducedPrice | Number | 优惠价格
+price  | String | Listing price
+tokenAddress  | String  | The token contract address for selling your NFT
+amount  | Number  | listing quantity
+plateFromAddress  | string  | Bidder address
+nftType  | String | nft type
+couponCode  | String | Discount code
+reducedPrice | Number | Discount price
 
 
 Auction Listing of Assets
@@ -248,17 +248,24 @@ createAuction()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftType  | String | nft类型
-nftAddress  | String | nft合约地址
+nftType  | String | nft type
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-startTimeStamp  | String | 拍卖开始时间
-endTimeStamp  | String | 拍卖结束时间
-startBid  | String | 起拍价
-fixPrice  | String | 一口价
-ReserveBid  | String | 保底价
-fee  | Number | 手续费
-amount  | Number  | 上架数量
-payAddress  | String  | 上架币种合约地址
+startTimeStamp  | String | auction start time
+endTimeStamp  | String | auction end time
+startBid  | String | starting price
+fixPrice  | String | fixed price
+ReserveBid  | String | reserve price
+fee  | Number | handling fee
+amount  | Number  | listing quantity
+payAddress  | String  | The token contract address for selling your NFT
+
+
+
+
+
+
+
 
 Auction Bidding
 
@@ -267,14 +274,18 @@ auction_placeBid()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftType  | String | nft类型
-nftAddress  | String | nft合约地址
+nftType  | String | nft type
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-fixPrice  | Number | 竞拍价格
-payAddress  | String  | 支付币种合约地址
-owner  | String  | 售卖者地址
-fromAddress  | String  | 竞拍者地址
-marketAddress  | String  | 销售合约地址
+fixPrice  | Number | Bidding price
+payAddress  | String  | The token contract address for bidding
+owner  | String  | owner address
+fromAddress  | String  | Bidder address
+marketAddress  | String  | plateFrom address
+
+
+
+
 
 Remove Assets from Listing
 
@@ -283,12 +294,12 @@ offSale()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftAddress  | String | nft合约地址
+nftAddress  | String | nft contract address
 nftid  | String | nftid
 seller  | String | seller
 plateFromAddress  | String | plateFromAddress
-nftType  | String | nft类型
-nftTokenIds  | String | nftId列表
+nftType  | String | nft type
+nftTokenIds  | String | nftId list
 
 
 Withdraw from Auction
@@ -298,10 +309,10 @@ auction_end()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftType  | String | nft类型
-nftAddress  | String | nft合约地址
+nftType  | String | nft type
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-owner  | String  | ERC1155类型，需要上架者地址
+owner  | String  | ERC1155 type, requires the address of the owner
 
 Purchase Assets
 ```
@@ -309,15 +320,17 @@ NftPayOrder()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-nftType  | String | nft类型
-nftAddress  | String | nft合约地址
+nftType  | String | nft type
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-toAddress  | String  | 购买者地址
-price  | Number  | 购买价格
-marketType  | String  | 购买类型
-couponCode  | String  | 优惠码，没有就填‘0’
-couponLink  | String  | couponLink，没有就填‘0’
-payAddress  | String  | 支付币种合约地址
+toAddress  | String  | buyer address
+price  | Number  | purchase price
+marketType  | String  |  purchase type
+couponCode  | String  | coupon code, fill in ‘0’ if none
+couponLink  | String  | couponLink, fill in ‘0’ if none
+payAddress  | String  | The token contract address for purchasing
+
+
 
 Place an Offer
 
@@ -328,13 +341,13 @@ createOffer()
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
 plateFromAddress  | String | plateFromAddress
-nftType  | String | nft类型
-offerNumber  | String | 出价号码(随机数)
-nftAddress  | String | nft合约地址
+nftType  | String | nft type
+offerNumber  | String | Offer number (random number)
+nftAddress  | String | nft contract address
 nftid  | String | nftid
-payAddress  | String | 支付币种合约地址
-payAmount  | Number | 出价金额
-expiry | String | 出价有效期
+payAddress  | String | The token contract address for bidding
+payAmount  | Number | Offer amount
+expiry | String | Offer validity period
 
 Cancel an Offer
 
@@ -345,8 +358,8 @@ cancelOffer()
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
 plateFromAddress  | String | plateFromAddress
-nftType  | String | nft类型
-offerNumber  | String | 出价号码(随机数)
+nftType  | String | nft type
+offerNumber  | String | offer number (random number)
 
 Accept an Offer
 
@@ -356,10 +369,10 @@ acceptOffer()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-plateFromAddress  | String | 出价合约地址
-nftType  | String | nft类型
-offerNumber  | String | 出价号码(随机数)
-nftAddress  | String | nft合约地址
+plateFromAddress  | String | offer contract address
+nftType  | String | nft type
+offerNumber  | String | offer number (random number)
+nftAddress  | String | offer contract address
 nftid  | String | nftid
 
 
@@ -370,7 +383,7 @@ getFeeByChainID()
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
 tokenIds  | Array | tokenid
-chainId  | Number | 链chainid
+chainId  | Number | Target chain id
 
 
 Cross-Chain Transfer of Assets (supporting Uptick, Polygon, Arbitrum, BSC)
@@ -380,10 +393,12 @@ uptickToEVM()
 ```
 Params     |  Parameter type  | Parameter description
 :---: | :---: | :---: 
-tochainId  | Number | 目标链chainid
-toAddress  | String | 接受地址
-metadate  | String | metadate信息
-plateFromAddress  | String | 跨链合约地址
+tochainId  | Number | Target chain id
+toAddress  | String | Receiving address
+metadate  | String | Metadate information
+plateFromAddress  | String | Offer contract address
+
+
 
 
 ## Problem Reporting
