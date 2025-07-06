@@ -5,40 +5,53 @@ import { abi as ERC20ABI } from './abi/IERC20.json';
 import { toWords0, encode0, bech32, fromWords0 } from './bech32';
 import { resolve } from 'url';
 import Web3Auth, {
-  LOGIN_PROVIDER,
-  OPENLOGIN_NETWORK,
+  ChainNamespace, LOGIN_PROVIDER, WEB3AUTH_NETWORK
 } from '@web3auth/react-native-sdk';
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import * as WebBrowser from '@toruslabs/react-native-web-browser';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 // TODO: change it on chain change (setProvider?)
 const web3 = new Web3('https://json-rpc.uptick.network');
 let web3authObj;
+const chainConfig = {
+  chainNamespace: ChainNamespace.EIP155,
+  chainId: "0x75",
+  rpcTarget: "https://json-rpc.uptick.network",
+  // Avoid using public rpcTarget in production.
+  // Use services like Infura, Quicknode etc
+  displayName:'Upward',
+  blockExplorerUrl: "https://evm-explorer.uptick.network",
+  ticker: "UPTICK",
+  tickerName: "Uptick",
+  decimals: 18,
+  logo:"https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/uptick_117/chain.png",
+};
 
+const ethereumPrivateKeyProvider = new EthereumPrivateKeyProvider({
+  config: {
+    chainConfig,
+  },
+});
 export const initWeb3Auth = (
-  resolvedRedirectUrl,
+  redirectUrl,
   clientId,
   appName,
   logoLight,
   logoDark
 ) => {
+
+
+
   const web3auth = new Web3Auth(WebBrowser, EncryptedStorage, {
     clientId,
-    network: OPENLOGIN_NETWORK.SAPPHIRE_DEVNET, // or other networks
-    whiteLabel: {
-      appName: appName,
-      logoLight: logoLight,
-      logoDark: logoDark,
-      defaultLanguage: 'en',
-      mode: 'auto', // or "dark" or "light"
-      theme: {
-        primary: '#cddc39',
-      },
-    },
+    redirectUrl,
+    network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+    privateKeyProvider: ethereumPrivateKeyProvider,
   });
   web3authObj = {
     web3auth: web3auth,
-    resolvedRedirectUrl: resolvedRedirectUrl,
+    resolvedRedirectUrl: redirectUrl,
   };
 };
 
@@ -49,14 +62,15 @@ export const GoogleLogin = async () => {
   let googleLoginResult;
   try {
     await web3authObj.web3auth.init();
-
-    if (web3authObj.web3auth.privKey) {
-      console.log(web3authObj.web3auth.privKey);
-      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
+    if (web3authObj.web3auth.connected) {
+      // IMP END - SDK Initialization
       // setProvider(ethereumPrivateKeyProvider);
-      // uiConsole('Logged In');
-      // setLoggedIn(true);
+
     }
+
+    // if (web3authObj.web3auth.privKey) {
+    //   console.log(web3authObj.web3auth.privKey);
+    // }
 
     if (!web3authObj.web3auth.ready) {
       googleLoginResult = {
@@ -94,53 +108,7 @@ export const GoogleLogin = async () => {
       };
       return googleLoginResult;
     }
-    //   .then((result) => {
-    //     console.log('result=====', result);
-    //     if (result) {
-    //       console.log('Logging in start');
-    //       web3authObj.web3auth
-    //         .login({
-    //           loginProvider: LOGIN_PROVIDER.GOOGLE,
-    //           redirectUrl: web3authObj.resolvedRedirectUrl,
-    //         })
-    //         .then((response) => {
-    //           console.log('loginGoogle in  end0000');
-    //           if (web3authObj.web3auth.privKey) {
-    //             // console.log("web3auth.privKey",web3auth.privKey)
-    //             let userInfo = web3auth.userInfo();
-    //             console.log('web3 userInfo', userInfo);
 
-    //             if (userInfo && userInfo.name) {
-    //               googleLoginResult = {
-    //                 privateKey: web3authObj.web3auth.privKey,
-    //                 userInfo: userInfo,
-    //                 success:true
-    //               };
-    //             }
-
-    //             web3authObj.web3auth.logout();
-    //             return googleLoginResult;
-    //           }
-    //         })
-    //         .catch((error: any) => {
-    //            googleLoginResult = {
-    //                msg:error.message,
-    //                 success:false
-    //               };
-    //   return googleLoginResult;
-
-    //         });
-    //     } else {
-    //       googleLoginResult = {
-
-    //                msg:'create.errors.logiinError',
-    //                 success:false
-    //               };
-    //   return googleLoginResult;
-
-    //     }
-    //   })
-    //   .catch(console.error);
   } catch (e: any) {
     console.log(e.message);
   }
@@ -157,10 +125,7 @@ export const EmailLogin = async (email) => {
 
     if (web3authObj.web3auth.privKey) {
       console.log(web3authObj.web3auth.privKey);
-      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
-      // setProvider(ethereumPrivateKeyProvider);
-      // uiConsole('Logged In');
-      // setLoggedIn(true);
+     
     }
 
     if (!web3authObj.web3auth.ready) {
@@ -180,7 +145,7 @@ export const EmailLogin = async (email) => {
         },
       });
 
-      if (web3authObj.web3auth.privKey) {
+      if (web3authObj.web3auth.connected) {
         // console.log("web3auth.privKey",web3auth.privKey)
         let userInfo = await web3authObj.web3auth.userInfo();
         console.log('web3 userInfo', userInfo);
