@@ -14,12 +14,10 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 // TODO: change it on chain change (setProvider?)
 const web3 = new Web3('https://json-rpc.uptick.network');
 let web3authObj;
-const chainConfig = {
+let chainConfig = {
   chainNamespace: ChainNamespace.EIP155,
   chainId: "0x75",
   rpcTarget: "https://json-rpc.uptick.network",
-  // Avoid using public rpcTarget in production.
-  // Use services like Infura, Quicknode etc
   displayName:'Upward',
   blockExplorerUrl: "https://evm-explorer.uptick.network",
   ticker: "UPTICK",
@@ -40,9 +38,8 @@ export const initWeb3Auth = (
   logoLight,
   logoDark
 ) => {
-
-
-
+  chainConfig.displayName = appName;
+  chainConfig.logo = logoLight;
   const web3auth = new Web3Auth(WebBrowser, EncryptedStorage, {
     clientId,
     redirectUrl,
@@ -57,16 +54,30 @@ export const initWeb3Auth = (
 
 // google
 export const GoogleLogin = async () => {
-  console.log('wxl ---- GoogleLogin');
+  console.log('wxl ---- GoogleLogin 88888');
 
   let googleLoginResult;
   try {
-    await web3authObj.web3auth.init();
-    if (web3authObj.web3auth.connected) {
-      // IMP END - SDK Initialization
-      // setProvider(ethereumPrivateKeyProvider);
-
+    if (!web3authObj || !web3authObj.web3auth) {
+      throw new Error('Web3Auth not initialized');
     }
+    
+    await web3authObj.web3auth.init();
+    // if (web3authObj.web3auth.connected) {
+    //   // IMP END - SDK Initialization
+    //   // setProvider(ethereumPrivateKeyProvider);
+    //   if (web3authObj.web3auth.state) { 
+    //    if (web3authObj.web3auth.state.userInfo && web3authObj.web3auth.state.userInfo.name) {
+    //       googleLoginResult = {
+    //         privateKey: web3authObj.web3auth.state.privKey,
+    //         userInfo: web3authObj.web3auth.state.userInfo,
+    //         success: true,
+    //       };
+    //      return googleLoginResult;
+    //     }
+    //   }
+
+    // }
 
     // if (web3authObj.web3auth.privKey) {
     //   console.log(web3authObj.web3auth.privKey);
@@ -85,32 +96,38 @@ export const GoogleLogin = async () => {
         loginProvider: LOGIN_PROVIDER.GOOGLE,
         redirectUrl: web3authObj.resolvedRedirectUrl,
       });
-      if (web3authObj.web3auth.privKey) {
-        // console.log("web3auth.privKey",web3auth.privKey)
-        let userInfo = await web3authObj.web3auth.userInfo();
-        console.log('web3 userInfo', userInfo);
+      console.log('wxl ---- 2222', JSON.stringify(web3authObj.web3auth));
+    console.log('wxl ---- 3333', web3authObj.web3auth.state.privKey);
+    
+      
+      if (web3authObj.web3auth.state) {
+      
 
-        if (userInfo && userInfo.name) {
+        if (web3authObj.web3auth.state.userInfo && web3authObj.web3auth.state.userInfo.name) {
           googleLoginResult = {
-            privateKey: web3authObj.web3auth.privKey,
-            userInfo: userInfo,
+            privateKey: web3authObj.web3auth.state.privKey,
+            userInfo: web3authObj.web3auth.state.userInfo,
             success: true,
           };
         }
-
         web3authObj.web3auth.logout();
         return googleLoginResult;
       }
     } else {
       googleLoginResult = {
-        msg: 'create.errors.logiinError',
+        msg: 'create.errors.loginError',
         success: false,
       };
       return googleLoginResult;
     }
 
   } catch (e: any) {
-    console.log(e.message);
+    console.log('GoogleLogin error:', e.message);
+    console.log('Error stack:', e.stack);
+    return {
+      msg: e.message || 'Unknown error occurred',
+      success: false,
+    };
   }
 };
 
@@ -123,10 +140,6 @@ export const EmailLogin = async (email) => {
   try {
     await web3authObj.web3auth.init();
 
-    if (web3authObj.web3auth.privKey) {
-      console.log(web3authObj.web3auth.privKey);
-     
-    }
 
     if (!web3authObj.web3auth.ready) {
       googleLoginResult = {
@@ -135,8 +148,7 @@ export const EmailLogin = async (email) => {
       };
       return googleLoginResult;
     }
-    let result = await checkGoogle();
-    if (result) {
+  
       let response = await web3authObj.web3auth.login({
         loginProvider: LOGIN_PROVIDER.EMAIL_PASSWORDLESS,
         redirectUrl: web3authObj.resolvedRedirectUrl,
@@ -146,28 +158,21 @@ export const EmailLogin = async (email) => {
       });
 
       if (web3authObj.web3auth.connected) {
-        // console.log("web3auth.privKey",web3auth.privKey)
-        let userInfo = await web3authObj.web3auth.userInfo();
-        console.log('web3 userInfo', userInfo);
-
-        if (userInfo && userInfo.name) {
+      // IMP END - SDK Initialization
+      // setProvider(ethereumPrivateKeyProvider);
+      if (web3authObj.web3auth.state) { 
+       if (web3authObj.web3auth.state.userInfo && web3authObj.web3auth.state.userInfo.name) {
           googleLoginResult = {
-            privateKey: web3authObj.web3auth.privKey,
-            userInfo: userInfo,
+            privateKey: web3authObj.web3auth.state.privKey,
+            userInfo: web3authObj.web3auth.state.userInfo,
             success: true,
           };
+         return googleLoginResult;
         }
-
-        web3authObj.web3auth.logout();
-        return googleLoginResult;
       }
-    } else {
-      googleLoginResult = {
-        msg: 'create.errors.logiinError',
-        success: false,
-      };
-      return googleLoginResult;
+
     }
+ 
   } catch (e: any) {
     console.log(e.message);
   }
@@ -179,13 +184,6 @@ export const AppleLogin = async () => {
   try {
     await web3authObj.web3auth.init();
 
-    if (web3authObj.web3auth.privKey) {
-      console.log(web3authObj.web3auth.privKey);
-      // await ethereumPrivateKeyProvider.setupProvider(web3auth.privKey);
-      // setProvider(ethereumPrivateKeyProvider);
-      // uiConsole('Logged In');
-      // setLoggedIn(true);
-    }
 
     if (!web3authObj.web3auth.ready) {
       googleLoginResult = {
@@ -194,36 +192,28 @@ export const AppleLogin = async () => {
       };
       return googleLoginResult;
     }
-    let result = await checkGoogle();
-    if (result) {
+ 
       let response = await web3authObj.web3auth.login({
         loginProvider: LOGIN_PROVIDER.APPLE,
         redirectUrl: web3authObj.resolvedRedirectUrl,
       });
 
-      if (web3authObj.web3auth.privKey) {
-        // console.log("web3auth.privKey",web3auth.privKey)
-        let userInfo = await web3authObj.web3auth.userInfo();
-        console.log('web3 userInfo', userInfo);
-
-        if (userInfo && userInfo.name) {
+    if (web3authObj.web3auth.connected) {
+      // IMP END - SDK Initialization
+      // setProvider(ethereumPrivateKeyProvider);
+      if (web3authObj.web3auth.state) { 
+       if (web3authObj.web3auth.state.userInfo && web3authObj.web3auth.state.userInfo.name) {
           googleLoginResult = {
-            privateKey: web3authObj.web3auth.privKey,
-            userInfo: userInfo,
+            privateKey: web3authObj.web3auth.state.privKey,
+            userInfo: web3authObj.web3auth.state.userInfo,
             success: true,
           };
+         return googleLoginResult;
         }
-
-        web3authObj.web3auth.logout();
-        return googleLoginResult;
       }
-    } else {
-      googleLoginResult = {
-        msg: 'create.errors.logiinError',
-        success: false,
-      };
-      return googleLoginResult;
+
     }
+ 
   } catch (e: any) {
     console.log(e.message);
   }
