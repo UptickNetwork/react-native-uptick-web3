@@ -1,5 +1,5 @@
-import {abi, bytecode} from '../abi/Uptick721.json';
-import {getWeb3Instance} from '../web3Util';
+import { abi, bytecode } from '../abi/Uptick721.json';
+import { getWeb3Instance } from '../web3Util';
 const web3 = getWeb3Instance();
 
 export async function deploy(privateKey, gasPrice, name, metadataUrl) {
@@ -22,14 +22,14 @@ export async function deploy(privateKey, gasPrice, name, metadataUrl) {
       },
       function (e, transactionHash) {
         console.log(e);
-      },
+      }
     )
     .on('receipt', function (receipt) {
       console.log('Deploy Result', receipt);
 
       return receipt.address;
     })
-    .on('error', error => {
+    .on('error', (error) => {
       console.error(error);
     });
   return proof._address;
@@ -40,7 +40,7 @@ export async function mintNft(
   nftAddress,
   tokenId,
   baseurl,
-  mintByCreatorFee,
+  mintByCreatorFee
 ) {
   try {
     const contract = new web3.eth.Contract(abi, nftAddress);
@@ -56,7 +56,7 @@ export async function mintNft(
 export async function isApprovedForAll(
   accountAddress: string,
   nftAddress: string,
-  plateFromAddress: string,
+  plateFromAddress: string
 ) {
   const contract = new web3.eth.Contract(abi, nftAddress);
   let transferTx = contract.methods
@@ -77,7 +77,7 @@ export async function isApprovedForAll(
 
 export function setApprovalForAll(
   accountAddress: string,
-  plateFromAddress: string,
+  plateFromAddress: string
 ) {
   try {
     const contract = new web3.eth.Contract(abi, accountAddress);
@@ -95,7 +95,7 @@ export function NftTransfer(
   from: string,
   to: string,
   tokenId: string,
-  nftAddress: string,
+  nftAddress: string
 ) {
   try {
     const contract = new web3.eth.Contract(abi, nftAddress);
@@ -113,7 +113,7 @@ export function NftTransfer(
 export function setApprovTokenid(
   offerAddress: string,
   tokenId: string,
-  nftAddress: string,
+  nftAddress: string
 ) {
   try {
     const contract = new web3.eth.Contract(abi, nftAddress);
