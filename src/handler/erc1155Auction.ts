@@ -1,5 +1,5 @@
-import {abi} from '../abi/ERC721Auction.json';
-import {getWeb3Instance} from '../web3Util';
+import { abi } from '../abi/ERC721Auction.json';
+import { getWeb3Instance } from '../web3Util';
 const web3 = getWeb3Instance();
 
 export async function placeBid(
@@ -7,7 +7,7 @@ export async function placeBid(
   nftAddress,
   nftid,
   fixPrice,
-  owner,
+  owner
 ) {
   //let rep = await contract.bid(nftAddress,owner,nftid,fixPrice, {
 
@@ -34,7 +34,7 @@ export async function createAuction(
   _buyoutPrice,
   _guaranteedPrice,
   tokenAddress,
-  marketAddress,
+  marketAddress
 ) {
   try {
     const contract = new web3.eth.Contract(abi, marketAddress);
@@ -50,7 +50,7 @@ export async function createAuction(
         _buyoutPrice,
         _guaranteedPrice,
         tokenAddress,
-        marketAddress,
+        marketAddress
       )
       .encodeABI();
 
@@ -64,7 +64,7 @@ export async function endAuction(
   nftAddress,
   nftid,
   _auctioneer,
-  marketAddress,
+  marketAddress
 ) {
   try {
     const contract = new web3.eth.Contract(abi, marketAddress);

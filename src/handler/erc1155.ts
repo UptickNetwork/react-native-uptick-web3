@@ -1,6 +1,6 @@
-import {abi, bytecode} from '../abi/Uptick1155.json';
-import {getWeb3Instance} from '../web3Util';
-import {ethers} from 'ethers';
+import { abi, bytecode } from '../abi/Uptick1155.json';
+import { getWeb3Instance } from '../web3Util';
+import { ethers } from 'ethers';
 const web3 = getWeb3Instance();
 
 export async function deploy(privateKey, gasPrice, name, metadataUrl) {
@@ -24,14 +24,14 @@ export async function deploy(privateKey, gasPrice, name, metadataUrl) {
       },
       function (e, transactionHash) {
         console.log(e);
-      },
+      }
     )
     .on('receipt', function (receipt) {
       console.log('Deploy Result', receipt);
 
       return receipt.address;
     })
-    .on('error', error => {
+    .on('error', (error) => {
       console.error(error);
       // 合约部署失败时的处理逻辑
     });
@@ -44,7 +44,7 @@ export async function mintNft(
   tokenId,
   baseurl,
   royaltyPercentage,
-  amountValue,
+  amountValue
 ) {
   console.log(
     'mintNft  ------ mintNft 00000000',
@@ -53,7 +53,7 @@ export async function mintNft(
     baseurl,
     royaltyPercentage,
     amountValue,
-    nftAddress,
+    nftAddress
   );
   try {
     const contract = new web3.eth.Contract(abi, nftAddress);
@@ -63,7 +63,7 @@ export async function mintNft(
         tokenId,
         amountValue,
         ethers.toUtf8Bytes(''),
-        royaltyPercentage,
+        royaltyPercentage
       )
       .encodeABI();
 
@@ -76,7 +76,7 @@ export async function mintNft(
 export async function isApprovedForAll(
   accountAddress: string,
   nftAddress: string,
-  plateFromAddress: string,
+  plateFromAddress: string
 ) {
   const contract = new web3.eth.Contract(abi, nftAddress);
   let transferTx = contract.methods
@@ -97,7 +97,7 @@ export async function isApprovedForAll(
 
 export function setApprovalForAll(
   accountAddress: string,
-  plateFromAddress: string,
+  plateFromAddress: string
 ) {
   try {
     const contract = new web3.eth.Contract(abi, accountAddress);
