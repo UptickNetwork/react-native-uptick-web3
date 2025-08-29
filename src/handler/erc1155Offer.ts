@@ -1,5 +1,5 @@
-import {abi} from '../abi/MarketplaceOffer1155.json';
-import {getWeb3Instance} from '../web3Util';
+import { abi } from '../abi/MarketplaceOffer1155.json';
+import { getWeb3Instance } from '../web3Util';
 const web3 = getWeb3Instance();
 
 export async function createOffer(
@@ -9,7 +9,7 @@ export async function createOffer(
   tokenId,
   payAddress,
   value,
-  expiry,
+  expiry
 ) {
   console.log(
     'placeOrder  ------ 888888888888888',
@@ -18,7 +18,7 @@ export async function createOffer(
     tokenId,
     payAddress,
     value,
-    expiry,
+    expiry
   );
   try {
     const contract = new web3.eth.Contract(abi, platformAddress);
@@ -50,7 +50,7 @@ export async function acceptOffer(
   platformAddress,
   offerNumber,
   nftAddress,
-  tokenId,
+  tokenId
 ) {
   try {
     const contract = new web3.eth.Contract(abi, platformAddress);
