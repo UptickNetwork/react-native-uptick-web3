@@ -15,6 +15,7 @@ const erc1155Offer = require('./handler/erc1155Offer.ts');
 const uptick721 = require('./handler/erc721.ts');
 const uptick1155 = require('./handler/erc1155.ts');
 const lazyNFT1948 = require('./handler/lazyNFT1948.ts');
+const uptick20 = require('./handler/erc20.ts');
 
 const web3 = getWeb3Instance();
 // address, platformAddress
@@ -53,6 +54,28 @@ export async function deploy(
     return result;
   }
 }
+
+export async function erc20Deploy(
+  privateKey,
+  gasPrice,
+  name,
+   symbol,
+   totalSupply,
+   decimals
+) {
+
+    let result = await uptick20.deploy(
+      privateKey,
+      gasPrice,
+      name,
+     symbol,
+     totalSupply,
+     decimals
+    );
+    return result;
+  
+}
+
 
 export async function mintNft(
   nftType,
