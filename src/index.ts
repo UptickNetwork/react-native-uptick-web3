@@ -786,6 +786,12 @@ export const NftPayOrder = (
   } else if (nftType == 'ERC1155') {
 
     if (marketType == '3' || marketType == '5') {
+		if (!couponCode) {
+		  couponCode = 0;
+		}
+		if (!couponLink) {
+		  couponLink = 0;
+		}
       const contract = new web3.eth.Contract(ERCCoupon1155, contractAddress);
       const transferTx = contract.methods
         .placeOrder(
