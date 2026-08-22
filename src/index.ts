@@ -1,12 +1,12 @@
-import {ethers} from 'ethers';
-import {utils, getWeb3Instance} from './web3Util';
-import {abi as ERCCoupon721} from './abi/ERC721CouponPlatform.json';
-import {abi as ERCCoupon1155} from './abi/ERC1155CouponPlatform.json';
-import {abi as ERC20ABI} from './abi/IERC20.json';
-import {abi as AllowanceABI} from './abi/Allowance.json';
-import {abi as ERC721PlatformABI} from './abi/ERC721Platform.json';
-import {abi as ERC1155PlatformABI} from './abi/ERC1155Platform.json';
-import {abi as BridgeABI} from './abi/Bridge.json';
+import { ethers } from 'ethers';
+import { utils, getWeb3Instance } from './web3Util';
+import { abi as ERCCoupon721 } from './abi/ERC721CouponPlatform.json';
+import { abi as ERCCoupon1155 } from './abi/ERC1155CouponPlatform.json';
+import { abi as ERC20ABI } from './abi/IERC20.json';
+import { abi as AllowanceABI } from './abi/Allowance.json';
+import { abi as ERC721PlatformABI } from './abi/ERC721Platform.json';
+import { abi as ERC1155PlatformABI } from './abi/ERC1155Platform.json';
+import { abi as BridgeABI } from './abi/Bridge.json';
 
 const erc721Auction = require('./handler/erc721Auction.ts');
 const erc1155Auction = require('./handler/erc1155Auction.ts');
@@ -54,28 +54,31 @@ export async function deploy(
     return result;
   }
 }
+export async function deployData(nftType, name, metadataUrl, lazySignAddress) {
+  if (nftType == 'ERC1155') {
+    let result = await uptick1155.deployData(name, metadataUrl);
+    return result;
+  }
+}
 
 export async function erc20Deploy(
   privateKey,
   gasPrice,
   name,
-   symbol,
-   totalSupply,
-   decimals
+  symbol,
+  totalSupply,
+  decimals,
 ) {
-
-    let result = await uptick20.deploy(
-      privateKey,
-      gasPrice,
-      name,
-     symbol,
-     totalSupply,
-     decimals
-    );
-    return result;
-  
+  let result = await uptick20.deploy(
+    privateKey,
+    gasPrice,
+    name,
+    symbol,
+    totalSupply,
+    decimals,
+  );
+  return result;
 }
-
 
 export async function mintNft(
   nftType,
@@ -372,7 +375,6 @@ export const getFeeByChainID = (
   chainId: string,
   contractAddress: string,
 ): Promise<string> => {
-
   return new Promise((resolve, reject) => {
     const contract = new web3.eth.Contract(BridgeABI, contractAddress);
     contract.methods
@@ -400,7 +402,7 @@ export async function isApprovedForAll(
       nftAddress,
       plateFromAddress,
     );
-  
+
     return approveResult;
   } else if (nftType == 'ERC1155') {
     let approveResult = await uptick1155.isApprovedForAll(
@@ -432,11 +434,11 @@ export const setApprovalForAll = (
 ) => {
   if (nftType == 'ERC721' || nftType == 'ERC1948') {
     const transferTx = uptick721.setApprovalForAll(address, plateFromAddress);
-   
+
     return transferTx;
   } else if (nftType == 'ERC1155') {
     const transferTx = uptick721.setApprovalForAll(address, plateFromAddress);
-  
+
     return transferTx;
   }
 };
@@ -510,7 +512,6 @@ export const nftOnsale = (
   nftType: string,
   nftTokenIds: string,
 ) => {
-
   let weiPrice = 0;
   let prices = [];
   let chainAddresss = [];
@@ -609,7 +610,6 @@ export async function offsale(
   nftType: string,
   nftTokenIds: string,
 ) {
-
   let fromaddressarr = [];
 
   if (nftType == 'ERC721' || nftType == 'ERC1948') {
@@ -644,8 +644,6 @@ export async function offsale(
           fromaddressarr.push(seller);
         }
 
-       
-
         const contract = new web3.eth.Contract(
           ERC1155PlatformABI,
           plateFromAddress,
@@ -656,8 +654,6 @@ export async function offsale(
 
         return transferTx;
       } else {
-
-
         const contract = new web3.eth.Contract(
           ERC1155PlatformABI,
           plateFromAddress,
@@ -695,7 +691,6 @@ export const receiveAllowance = (
   signature: string,
   contractAddress: string,
 ) => {
-
   try {
     const contract = new web3.eth.Contract(AllowanceABI, contractAddress);
     const transferTx = contract.methods
@@ -737,7 +732,6 @@ export const check20ApprovalForAll = (
     })
     .catch((error: any) => {
       reject(error);
-     
     });
 
   return transferTx;
@@ -755,8 +749,6 @@ export const NftPayOrder = (
   couponCode: string,
   couponLink: string,
 ) => {
-
-
   if (nftType == 'ERC721' || nftType == 'ERC1948') {
     if (marketType == '3' || marketType == '5') {
       if (!couponCode) {
@@ -765,12 +757,12 @@ export const NftPayOrder = (
       if (!couponLink) {
         couponLink = 0;
       }
-     
+
       const contract = new web3.eth.Contract(ERCCoupon721, contractAddress);
       const transferTx = contract.methods
         .placeOrder(nftAddress, tokenId, to, couponCode, couponLink)
         .encodeABI();
-     
+
       return transferTx;
     } else {
       const contract = new web3.eth.Contract(
@@ -784,14 +776,13 @@ export const NftPayOrder = (
       return transferTx;
     }
   } else if (nftType == 'ERC1155') {
-
     if (marketType == '3' || marketType == '5') {
-		if (!couponCode) {
-		  couponCode = 0;
-		}
-		if (!couponLink) {
-		  couponLink = 0;
-		}
+      if (!couponCode) {
+        couponCode = 0;
+      }
+      if (!couponLink) {
+        couponLink = 0;
+      }
       const contract = new web3.eth.Contract(ERCCoupon1155, contractAddress);
       const transferTx = contract.methods
         .placeOrder(
@@ -809,7 +800,6 @@ export const NftPayOrder = (
       // nftAddress, nftId,toAddress,1,fromAddress,utils.toUtf8Bytes(''),
       return transferTx;
     } else {
-		
       const contract = new web3.eth.Contract(
         ERC1155PlatformABI,
         contractAddress,

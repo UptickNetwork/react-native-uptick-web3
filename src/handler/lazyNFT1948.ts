@@ -1,5 +1,5 @@
-import {abi, bytecode} from '../abi/LazyNFT1948.json';
-import {getWeb3Instance} from '../web3Util';
+import { abi, bytecode } from '../abi/LazyNFT1948.json';
+import { getWeb3Instance } from '../web3Util';
 
 const web3 = getWeb3Instance();
 export async function deploy(
@@ -35,7 +35,7 @@ export async function deploy(
 
       return receipt.address;
     })
-    .on('error', error => {
+    .on('error', (error) => {
       console.error(error);
       // 合约部署失败时的处理逻辑
     });
@@ -46,7 +46,16 @@ export function stringToBytes32(str) {
 
   return padded;
 }
+export async function deployData(name, metadataUrl, lazySignAddress) {
+  let web3 = getWeb3Instance();
+  let proofContract = new web3.eth.Contract(abi);
 
+  let data = await proofContract.deploy({
+    data: bytecode,
+    arguments: [name, metadataUrl, lazySignAddress],
+  });
+  return data;
+}
 export const LazyPayOrder = (
   toAddress,
   tokenId,

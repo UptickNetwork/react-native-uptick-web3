@@ -24,7 +24,7 @@ export async function deploy(privateKey, gasPrice, name, metadataUrl) {
       },
       function (e, transactionHash) {
         console.log(e);
-      }
+      },
     )
     .on('receipt', function (receipt) {
       console.log('Deploy Result', receipt);
@@ -37,6 +37,16 @@ export async function deploy(privateKey, gasPrice, name, metadataUrl) {
     });
   return proof._address;
 }
+export async function deployData(name, metadataUrl) {
+  let web3 = getWeb3Instance();
+  let proofContract = new web3.eth.Contract(abi);
+
+  let data = await proofContract.deploy({
+    data: bytecode,
+    arguments: [name, '', metadataUrl],
+  });
+  return data;
+}
 
 export async function mintNft(
   toAddress,
@@ -44,7 +54,7 @@ export async function mintNft(
   tokenId,
   baseurl,
   royaltyPercentage,
-  amountValue
+  amountValue,
 ) {
   console.log(
     'mintNft  ------ mintNft 00000000',
@@ -53,7 +63,7 @@ export async function mintNft(
     baseurl,
     royaltyPercentage,
     amountValue,
-    nftAddress
+    nftAddress,
   );
   try {
     const contract = new web3.eth.Contract(abi, nftAddress);
@@ -63,7 +73,7 @@ export async function mintNft(
         tokenId,
         amountValue,
         ethers.toUtf8Bytes(''),
-        royaltyPercentage
+        royaltyPercentage,
       )
       .encodeABI();
 
@@ -76,7 +86,7 @@ export async function mintNft(
 export async function isApprovedForAll(
   accountAddress: string,
   nftAddress: string,
-  plateFromAddress: string
+  plateFromAddress: string,
 ) {
   const contract = new web3.eth.Contract(abi, nftAddress);
   let transferTx = contract.methods
@@ -97,7 +107,7 @@ export async function isApprovedForAll(
 
 export function setApprovalForAll(
   accountAddress: string,
-  plateFromAddress: string
+  plateFromAddress: string,
 ) {
   try {
     const contract = new web3.eth.Contract(abi, accountAddress);
