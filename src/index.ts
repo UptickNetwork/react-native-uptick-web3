@@ -8,16 +8,29 @@ import { abi as ERC721PlatformABI } from './abi/ERC721Platform.json';
 import { abi as ERC1155PlatformABI } from './abi/ERC1155Platform.json';
 import { abi as BridgeABI } from './abi/Bridge.json';
 
-const erc721Auction = require('./handler/erc721Auction.ts');
-const erc1155Auction = require('./handler/erc1155Auction.ts');
-const erc721Offer = require('./handler/erc721Offer.ts');
-const erc1155Offer = require('./handler/erc1155Offer.ts');
-const uptick721 = require('./handler/erc721.ts');
-const uptick1155 = require('./handler/erc1155.ts');
-const lazyNFT1948 = require('./handler/lazyNFT1948.ts');
-const uptick20 = require('./handler/erc20.ts');
+import * as erc721Auction from './handler/erc721Auction';
+import * as erc1155Auction from './handler/erc1155Auction';
+import * as erc721Offer from './handler/erc721Offer';
+import * as erc1155Offer from './handler/erc1155Offer';
+import * as uptick721 from './handler/erc721';
+import * as uptick1155 from './handler/erc1155';
+import * as lazyNFT1948 from './handler/lazyNFT1948';
+import * as uptick20 from './handler/erc20';
 
 const web3 = getWeb3Instance();
+
+// 6 位小数代币（USDC/USDT 等）地址白名单：这些代币的金额换算使用 'mwei'
+const SIX_DECIMAL_TOKENS = [
+  '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd',
+  '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75',
+  '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687',
+  '0xeceeefcee421d8062ef8d6b4d814efe4dc898265',
+  '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+  '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+];
+const isSixDecimalToken = (addr: string) =>
+  SIX_DECIMAL_TOKENS.includes((addr || '').toLowerCase());
+
 // address, platformAddress
 export async function deploy(
   nftType,
@@ -124,18 +137,11 @@ export async function auction_placeBid(
 ) {
   try {
     let fee = 0;
-    if (
-      payAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-      payAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-      payAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-      payAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-      payAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-      payAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-    ) {
-      // uptick测试环境生产环境的IRIS ATOM 保留6位
-      fixPrice = fixPrice * 1000000;
+    if (isSixDecimalToken(payAddress)) {
+      // uptick 测试/生产环境的 IRIS/ATOM 保留 6 位小数，用 'mwei' 换算避免浮点精度丢失
+      fixPrice = web3.utils.toWei(String(fixPrice), 'mwei');
     } else {
-      fixPrice = web3.utils.toWei(fixPrice.toString());
+      fixPrice = web3.utils.toWei(String(fixPrice));
     }
 
     if (payAddress != '0x0000000000000000000000000000000000000000') {
@@ -168,7 +174,8 @@ export async function auction_placeBid(
       return result;
     }
   } catch (error) {
-    console.log('auction_placeBid', error);
+    console.error('auction_placeBid', error);
+    throw error;
   }
 }
 
@@ -183,18 +190,11 @@ export async function createOffer(
   payAmount,
   expiry,
 ) {
-  if (
-    payAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-    payAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-    payAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-    payAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-    payAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-    payAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-  ) {
-    // uptick测试环境生产环境的IRIS ATOM 保留6位
-    payAmount = payAmount * 1000000;
+  if (isSixDecimalToken(payAddress)) {
+    // uptick 测试/生产环境的 IRIS/ATOM 保留 6 位小数
+    payAmount = web3.utils.toWei(String(payAmount), 'mwei');
   } else {
-    payAmount = web3.utils.toWei(payAmount.toString());
+    payAmount = web3.utils.toWei(String(payAmount));
   }
 
   if (nftType == 'ERC721' || nftType == 'ERC1948') {
@@ -285,14 +285,7 @@ export async function createAuction(
   let _buyoutPrice = 0;
   let _guaranteedPrice = 0;
 
-  if (
-    tokenAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-    tokenAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-    tokenAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-    tokenAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-    tokenAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-    tokenAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-  ) {
+  if (isSixDecimalToken(tokenAddress)) {
     _reservePrice = utils.toWei(reservePrice, 'mwei');
     if (buyoutPrice > 0) {
       _buyoutPrice = utils.toWei(buyoutPrice, 'mwei');
@@ -325,8 +318,10 @@ export async function createAuction(
     );
     return result;
   } else if (nftType == 'ERC1155') {
+    // 注意：erc1155Auction.createAuction 参数顺序为
+    // (nftAddress, nftid, _amount, _auctioneer, _startTime, _endTime,
+    //  _reservePrice, _buyoutPrice, _guaranteedPrice, tokenAddress, marketAddress)
     let result = erc1155Auction.createAuction(
-      platformAddress,
       nftAddress,
       nftid,
       _amount,
@@ -337,6 +332,7 @@ export async function createAuction(
       _buyoutPrice,
       _guaranteedPrice,
       tokenAddress,
+      platformAddress,
     );
 
     return result;
@@ -385,7 +381,7 @@ export const getFeeByChainID = (
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('getFeeByChainID error', error);
       });
   });
 };
@@ -437,7 +433,7 @@ export const setApprovalForAll = (
 
     return transferTx;
   } else if (nftType == 'ERC1155') {
-    const transferTx = uptick721.setApprovalForAll(address, plateFromAddress);
+    const transferTx = uptick1155.setApprovalForAll(address, plateFromAddress);
 
     return transferTx;
   }
@@ -456,14 +452,7 @@ export const nftOnsaleCoupon = (
 ) => {
   let weiPrice = 0;
   let couponPrice = 0;
-  if (
-    tokenAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-    tokenAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-    tokenAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-    tokenAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-    tokenAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-    tokenAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-  ) {
+  if (isSixDecimalToken(tokenAddress)) {
     weiPrice = utils.toWei(price, 'mwei');
     couponPrice = utils.toWei(couponValue, 'mwei');
   } else {
@@ -517,14 +506,7 @@ export const nftOnsale = (
   let chainAddresss = [];
   if (price > 0) {
     if (nftTokenIds) {
-      if (
-        tokenAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-        tokenAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-        tokenAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-        tokenAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-        tokenAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-        tokenAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-      ) {
+      if (isSixDecimalToken(tokenAddress)) {
         weiPrice = utils.toWei(price, 'mwei');
         for (let i = 0; i < nftId.length; i++) {
           prices.push(weiPrice);
@@ -538,14 +520,7 @@ export const nftOnsale = (
         }
       }
     } else {
-      if (
-        tokenAddress == '0x80b5a32e4f032b2a058b4f29ec95eefeeb87adcd' ||
-        tokenAddress == '0xd567b3d7b8fe3c79a1ad8da978812cfc4fa05e75' ||
-        tokenAddress == '0x5fd55a1b9fc24967c4db09c513c3ba0dfa7ff687' ||
-        tokenAddress == '0xeceeefcee421d8062ef8d6b4d814efe4dc898265' ||
-        tokenAddress == '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359' ||
-        tokenAddress == '0xaf88d065e77c8cc2239327c5edb3a432268e5831'
-      ) {
+      if (isSixDecimalToken(tokenAddress)) {
         weiPrice = utils.toWei(price, 'mwei');
       } else {
         weiPrice = utils.toWei(price);
@@ -665,7 +640,8 @@ export async function offsale(
         return transferTx;
       }
     } catch (error) {
-      console.log('error', error);
+      console.error('offsale error', error);
+      throw error;
     }
   }
 }
@@ -699,7 +675,8 @@ export const receiveAllowance = (
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('receiveAllowance error', error);
+    throw error;
   }
 };
 
@@ -724,17 +701,7 @@ export const check20ApprovalForAll = (
   amount: number,
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
-  const transferTx = contract.methods
-    .allowance(from, platFromAddress)
-    .call()
-    .then((balance: any) => {
-      resolve(balance);
-    })
-    .catch((error: any) => {
-      reject(error);
-    });
-
-  return transferTx;
+  return contract.methods.allowance(from, platFromAddress).call();
 };
 
 export const NftPayOrder = (

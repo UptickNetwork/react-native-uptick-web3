@@ -33,7 +33,9 @@ export async function deploy(privateKey, gasPrice, name, metadataUrl) {
         gasLimit: '0x3D0900', // 4,000,000 gas
       },
       function (e, transactionHash) {
-        console.log(e);
+        if (e) {
+          console.error('deploy error', e);
+        }
       }
     )
     .on('receipt', function (receipt) {
@@ -66,7 +68,8 @@ export async function mintNft(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721 error', error);
+    throw error;
   }
 }
 
@@ -82,20 +85,9 @@ export async function isApprovedForAll(
   plateFromAddress: string
 ) {
   const contract = new web3.eth.Contract(abi, nftAddress);
-  let transferTx = contract.methods
+  return contract.methods
     .isApprovedForAll(accountAddress, plateFromAddress)
-    .call()
-    .then((result: any) => {
-      console.log('result', result);
-
-      // resolve(result);
-      return result;
-    })
-    .catch((error: any) => {
-      reject(error);
-      console.log('isApprovedForAllerror', error);
-    });
-  return transferTx;
+    .call();
 }
 
 /**
@@ -114,7 +106,8 @@ export function setApprovalForAll(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721 error', error);
+    throw error;
   }
 }
 
@@ -137,7 +130,8 @@ export function NftTransfer(
       .encodeABI();
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721 error', error);
+    throw error;
   }
 }
 
@@ -158,6 +152,7 @@ export function setApprovTokenid(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721 error', error);
+    throw error;
   }
 }

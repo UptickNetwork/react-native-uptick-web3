@@ -3,7 +3,6 @@ import * as bip39 from 'bip39';
 import { ethers } from 'ethers';
 import { abi as ERC20ABI } from './abi/IERC20.json';
 import { toWords0, encode0, bech32, fromWords0 } from './bech32';
-import { resolve } from 'url';
 import Web3Auth, {
   ChainNamespace,
   LOGIN_PROVIDER,
@@ -44,7 +43,7 @@ export const initWeb3Auth = (
   const web3auth = new Web3Auth(WebBrowser, EncryptedStorage, {
     clientId,
     redirectUrl,
-    network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+    network: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
     privateKeyProvider: ethereumPrivateKeyProvider,
   });
   web3authObj = {
@@ -55,8 +54,6 @@ export const initWeb3Auth = (
 
 // google
 export const GoogleLogin = async () => {
-  console.log('wxl ---- GoogleLogin 88888');
-
   let googleLoginResult;
   try {
     if (!web3authObj || !web3authObj.web3auth) {
@@ -64,25 +61,6 @@ export const GoogleLogin = async () => {
     }
 
     await web3authObj.web3auth.init();
-    // if (web3authObj.web3auth.connected) {
-    //   // IMP END - SDK Initialization
-    //   // setProvider(ethereumPrivateKeyProvider);
-    //   if (web3authObj.web3auth.state) {
-    //    if (web3authObj.web3auth.state.userInfo && web3authObj.web3auth.state.userInfo.name) {
-    //       googleLoginResult = {
-    //         privateKey: web3authObj.web3auth.state.privKey,
-    //         userInfo: web3authObj.web3auth.state.userInfo,
-    //         success: true,
-    //       };
-    //      return googleLoginResult;
-    //     }
-    //   }
-
-    // }
-
-    // if (web3authObj.web3auth.privKey) {
-    //   console.log(web3authObj.web3auth.privKey);
-    // }
 
     if (!web3authObj.web3auth.ready) {
       googleLoginResult = {
@@ -97,9 +75,6 @@ export const GoogleLogin = async () => {
         loginProvider: LOGIN_PROVIDER.GOOGLE,
         redirectUrl: web3authObj.resolvedRedirectUrl,
       });
-      console.log('wxl ---- 2222', JSON.stringify(web3authObj.web3auth));
-      console.log('wxl ---- 3333', web3authObj.web3auth.state.privKey);
-
       if (web3authObj.web3auth.state) {
         if (
           web3authObj.web3auth.state.userInfo &&
@@ -111,7 +86,8 @@ export const GoogleLogin = async () => {
             success: true,
           };
         }
-        web3authObj.web3auth.logout();
+        // 一次性获取私钥：取到私钥后立即登出，避免会话长期驻留；登出失败不影响已返回的私钥
+        web3authObj.web3auth.logout().catch(() => {});
         return googleLoginResult;
       }
     } else {
@@ -122,8 +98,7 @@ export const GoogleLogin = async () => {
       return googleLoginResult;
     }
   } catch (e: any) {
-    console.log('GoogleLogin error:', e.message);
-    console.log('Error stack:', e.stack);
+    console.error('GoogleLogin error:', e.message);
     return {
       msg: e.message || 'Unknown error occurred',
       success: false,
@@ -134,10 +109,11 @@ export const GoogleLogin = async () => {
 // Email
 
 export const EmailLogin = async (email) => {
-  console.log('wxl ---- EmailLogin', email);
-
   let googleLoginResult;
   try {
+    if (!web3authObj || !web3authObj.web3auth) {
+      throw new Error('Web3Auth not initialized');
+    }
     await web3authObj.web3auth.init();
 
     if (!web3authObj.web3auth.ready) {
@@ -174,14 +150,19 @@ export const EmailLogin = async (email) => {
       }
     }
   } catch (e: any) {
-    console.log(e.message);
+    console.error('EmailLogin error:', e.message);
+    return {
+      msg: e.message || 'Unknown error occurred',
+      success: false,
+    };
   }
 };
 export const AppleLogin = async () => {
-  console.log('wxl ---- AppleLogin');
-
   let googleLoginResult;
   try {
+    if (!web3authObj || !web3authObj.web3auth) {
+      throw new Error('Web3Auth not initialized');
+    }
     await web3authObj.web3auth.init();
 
     if (!web3authObj.web3auth.ready) {
@@ -215,7 +196,11 @@ export const AppleLogin = async () => {
       }
     }
   } catch (e: any) {
-    console.log(e.message);
+    console.error('AppleLogin error:', e.message);
+    return {
+      msg: e.message || 'Unknown error occurred',
+      success: false,
+    };
   }
 };
 
@@ -229,8 +214,6 @@ const checkGoogle = () => {
   ])
     .then((response) => {
       if (!response.ok) {
-        console.log('jianceshib');
-
         return false;
       }
 
@@ -259,19 +242,22 @@ export const importWallet = (mnemonic: string) => {
     const eth_path = `m/44'/60'/0'/0/${index}`;
 
     let wallet;
+    let publicKey = '';
 
     if (mnemonic.length == 64 || mnemonic.length == 66) {
       if (mnemonic.length == 66) {
-        mnemonic.slice(2);
+        mnemonic = mnemonic.slice(2);
       }
       wallet = web3.eth.accounts.privateKeyToAccount(mnemonic);
-      wallet.publicKey = '';
+      // 私钥导入：无助记词，公钥由 ethers 从私钥推导
+      publicKey = new ethers.Wallet(wallet.privateKey).publicKey;
       mnemonic = '';
     } else {
       wallet = ethers.HDNodeWallet.fromMnemonic(
         ethers.Mnemonic.fromPhrase(mnemonic),
         eth_path,
       );
+      publicKey = wallet.publicKey;
     }
     if (!wallet.address) {
       return {};
@@ -282,8 +268,6 @@ export const importWallet = (mnemonic: string) => {
     if (privateKey.startsWith('0x')) {
       privateKey = privateKey.slice(2);
     }
-
-    const publicKey = wallet.publicKey;
     let wordsbyte = web3.utils.hexToBytes(wallet.address);
     let words = toWords0(wordsbyte);
 
@@ -297,7 +281,7 @@ export const importWallet = (mnemonic: string) => {
       mnemonic,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 export const evmAddress2UptickAddress = (evmAddress: string) => {
@@ -321,11 +305,9 @@ export const getHDWallet = (index: number, mnemonic: string) => {
     if (privateKey.startsWith('0x')) {
       privateKey = privateKey.slice(2);
     }
-    console.log('导入的privateKey', privateKey);
     const publicKey = wallet.publicKey;
     let wordsbyte = web3.utils.hexToBytes(wallet.address);
     let words = toWords0(wordsbyte);
-    console.log(words);
     let uptickAddress = encode0('uptick', words);
 
     return {
@@ -336,13 +318,13 @@ export const getHDWallet = (index: number, mnemonic: string) => {
       mnemonic,
     };
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 export const getAddressFromPrivatekey = (privateKey: string) => {
   if (privateKey.length == 64 || privateKey.length == 66) {
     if (privateKey.length == 66) {
-      privateKey.slice(2);
+      privateKey = privateKey.slice(2);
     }
     let wallet = web3.eth.accounts.privateKeyToAccount(privateKey);
     return wallet.address;
@@ -367,7 +349,7 @@ export const getAccounts = () => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('128error', error);
+        console.error('getAccounts error', error);
       });
   });
 };
@@ -377,32 +359,27 @@ export const getBalance = (
   rpcUrl: string,
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    setProvider(rpcUrl);
-    web3.eth
+    // 使用独立实例查询，避免修改模块级 web3 的全局 provider
+    const _web3 = new Web3(rpcUrl);
+    _web3.eth
       .getBalance(address)
       .then((balance) => {
-        console.log(address, '查询基础余额结果是' + balance);
-        resolve(web3.utils.fromWei(balance, 'ether'));
+        resolve(_web3.utils.fromWei(balance, 'ether'));
       })
       .catch((error: any) => {
         reject(error);
-        console.log('144error', error);
       });
   });
 };
 export const checkRpcAvalible = (rpc: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    console.log('rpc', rpc);
-    setProvider(rpc);
-    web3.eth
+    const _web3 = new Web3(rpc);
+    _web3.eth
       .getChainId()
       .then((chainId) => {
-        console.log('testRpcAvalible===', rpc, chainId);
-        resolve(chainId);
+        resolve(String(chainId));
       })
       .catch((error: any) => {
-        console.log('160error', error);
-        resolve('');
         reject(error);
       });
   });
@@ -422,7 +399,7 @@ export const getERC20Balance = (
       })
       .catch((error: any) => {
         reject(error);
-        console.log('180error getERC20Balance---', error);
+        console.error('getERC20Balance error', error);
       });
   });
 };
@@ -434,7 +411,7 @@ export const Token20Transfer = (
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
   const transferTx = contract.methods
-    .transfer(to, amount * 1000000)
+    .transfer(to, web3.utils.toWei(String(amount), 'mwei'))
     .encodeABI();
 
   return transferTx;
@@ -460,18 +437,7 @@ export const check20ApprovalForAll = (
   amount: number,
 ) => {
   const contract = new web3.eth.Contract(ERC20ABI, contractAddress);
-  const transferTx = contract.methods
-    .allowance(from, platFromAddress)
-    .call()
-    .then((balance: any) => {
-      resolve(balance);
-    })
-    .catch((error: any) => {
-      reject(error);
-      console.log('check20ApprovalForAll---', error);
-    });
-
-  return transferTx;
+  return contract.methods.allowance(from, platFromAddress).call();
 };
 
 export const signTransaction = (transaction: any, privateKey: string) => {
@@ -483,15 +449,18 @@ export const signTransaction = (transaction: any, privateKey: string) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
 
 export const signMessage = (message: string, privateKey: string) => {
   return new Promise((resolve, reject) => {
-    console.log('web3====', web3);
-    let httpProvider = new ethers.JsonRpcProvider(web3.host);
+    const rpcHost =
+      (web3 as any).host ||
+      ((web3 as any).currentProvider && (web3 as any).currentProvider.host) ||
+      'https://json-rpc.uptick.network';
+    let httpProvider = new ethers.JsonRpcProvider(rpcHost);
     const wallet = new ethers.Wallet(privateKey, httpProvider);
     wallet
       .signMessage(message)
@@ -500,7 +469,7 @@ export const signMessage = (message: string, privateKey: string) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -525,7 +494,7 @@ export const signTypedDataMessage = (
       })
       .catch((error: any) => {
         reject(error);
-        console.log('300error', error);
+        console.error('signTypedDataMessage error', error);
       });
   });
 };
@@ -539,8 +508,7 @@ export const sendSignedTransaction = (signedTransaction: any) => {
         resolve(receipt);
       })
       .catch((error: any) => {
-        resolve(error);
-        console.log('error', error);
+        reject(error);
       });
   });
 };
@@ -559,7 +527,7 @@ export const getTransactionReceipt = (transactionHash: string) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -573,7 +541,7 @@ export const getTransaction = (transactionHash: string) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -620,7 +588,7 @@ export const getBlock = (
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -634,7 +602,7 @@ export const getBlockTransactionCount = (blockNumber: number) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -648,7 +616,7 @@ export const getTransactionFromBlock = (blockNumber: number, index: number) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -662,7 +630,7 @@ export const getTransactionInBlock = (blockNumber: number, index: number) => {
       })
       .catch((error: any) => {
         reject(error);
-        console.log('error', error);
+        console.error('error', error);
       });
   });
 };
@@ -672,11 +640,10 @@ export const recoverPersonalSignature = (
   signature: string,
 ) => {
   try {
-    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
-    console.log(recoveredAddress);
+    const recoveredAddress = ethers.verifyMessage(message, signature);
     return recoveredAddress;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -719,7 +686,7 @@ export const createAccount = async (
     };
     return account;
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 export const uptickAddress2EVM = (uptickAddess: string) => {

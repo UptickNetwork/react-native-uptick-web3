@@ -18,7 +18,8 @@ export async function placeBid(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721Auction placeBid error', error);
+    throw error;
   }
 }
 
@@ -35,7 +36,6 @@ export function createAuction(
   _tokenAddress
 ) {
   try {
-    console.log('zxx===createAuction', marketAddress);
     const contract = new web3.eth.Contract(abi, marketAddress);
     const transferTx = contract.methods
       .createAuction(
@@ -51,7 +51,8 @@ export function createAuction(
       .encodeABI();
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721Auction createAuction error', error);
+    throw error;
   }
 }
 // 撤回拍卖
@@ -63,6 +64,7 @@ export function endAuction(nftAddress, nftid, _auctioneer, marketAddress) {
       .encodeABI();
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc721Auction endAuction error', error);
+    throw error;
   }
 }

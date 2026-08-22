@@ -27,7 +27,9 @@ export async function deploy(
         gasLimit: '0x3D0900',
       },
       function (e, transactionHash) {
-        console.log(e);
+        if (e) {
+          console.error('lazyNFT1948 deploy error', e);
+        }
       },
     )
     .on('receipt', function (receipt) {

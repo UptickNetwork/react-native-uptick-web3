@@ -21,7 +21,9 @@ export async function deploy(privateKey, gasPrice, name, symbol,totalSupply,deci
         gasLimit: '0x3D0900',
       },
       function (e, transactionHash) {
-        console.log(e);
+        if (e) {
+          console.error('erc20 deploy error', e);
+        }
       },
     )
     .on('receipt', function (receipt) {

@@ -19,7 +19,8 @@ export async function placeBid(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Auction placeBid error', error);
+    throw error;
   }
 }
 
@@ -56,7 +57,8 @@ export async function createAuction(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Auction createAuction error', error);
+    throw error;
   }
 }
 // 撤回拍卖
@@ -73,6 +75,7 @@ export async function endAuction(
       .encodeABI();
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Auction endAuction error', error);
+    throw error;
   }
 }

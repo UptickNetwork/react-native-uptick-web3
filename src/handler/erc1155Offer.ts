@@ -11,15 +11,6 @@ export async function createOffer(
   value,
   expiry
 ) {
-  console.log(
-    'placeOrder  ------ 888888888888888',
-    offerNumber,
-    nftAddress,
-    tokenId,
-    payAddress,
-    value,
-    expiry
-  );
   try {
     const contract = new web3.eth.Contract(abi, platformAddress);
     const transferTx = contract.methods
@@ -28,20 +19,21 @@ export async function createOffer(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Offer createOffer error', error);
+    throw error;
   }
 }
 
 //cancelOffer
 export async function cancelOffer(platformAddress, offerNumber) {
-  console.log('cancelOffer  ------ 11111111111', offerNumber);
   try {
     const contract = new web3.eth.Contract(abi, platformAddress);
     const transferTx = contract.methods.cancelOffer(offerNumber).encodeABI();
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Offer cancelOffer error', error);
+    throw error;
   }
 }
 
@@ -60,6 +52,7 @@ export async function acceptOffer(
 
     return transferTx;
   } catch (error) {
-    console.log(error);
+    console.error('erc1155Offer acceptOffer error', error);
+    throw error;
   }
 }
