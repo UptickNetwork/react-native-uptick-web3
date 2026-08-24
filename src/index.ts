@@ -16,6 +16,8 @@ import * as uptick721 from './handler/erc721';
 import * as uptick1155 from './handler/erc1155';
 import * as lazyNFT1948 from './handler/lazyNFT1948';
 import * as uptick20 from './handler/erc20';
+import * as erc3643Token from './handler/erc3643Token';
+import * as erc20Platform from './handler/erc20Platform';
 
 const web3 = getWeb3Instance();
 
@@ -835,4 +837,81 @@ export function NftTransfer(
     );
     return transferTx;
   }
+}
+
+// ==================== ERC3643 ====================
+
+/** ERC3643 授权平台合约转走待上架数量 */
+export function erc3643Approve(
+  tokenAddress: string,
+  spender: string,
+  amount: string | number,
+) {
+  return erc3643Token.approve(tokenAddress, spender, amount);
+}
+
+/** ERC3643 转送 */
+export function erc3643Transfer(
+  tokenAddress: string,
+  toAddress: string,
+  amount: string | number,
+) {
+  return erc3643Token.transfer(tokenAddress, toAddress, amount);
+}
+
+/** ERC3643 白名单校验（view） */
+export async function erc3643CheckWhitelist(
+  tokenAddress: string,
+  whiteAddress: string,
+) {
+  return erc3643Token.checkWhitelist(tokenAddress, whiteAddress);
+}
+
+/** ERC3643 是否暂停（view） */
+export async function erc3643IsPaused(tokenAddress: string) {
+  return erc3643Token.isPaused(tokenAddress);
+}
+
+/** ERC3643 allowance(owner, spender) */
+export async function erc3643Allowance(
+  tokenAddress: string,
+  owner: string,
+  spender: string,
+) {
+  return erc3643Token.allowance(tokenAddress, owner, spender);
+}
+
+/** ERC3643 上架：平台合约 onSale */
+export function erc3643OnSale(
+  platformAddress: string,
+  nftAddress: string,
+  amount: string | number,
+  price: string | number,
+  payAddress: string,
+) {
+  return erc20Platform.onSale(
+    platformAddress,
+    nftAddress,
+    amount,
+    price,
+    payAddress,
+  );
+}
+
+/** ERC3643 下架：平台合约 offSale(orderId) */
+export function erc3643OffSale(
+  platformAddress: string,
+  orderId: string | number,
+) {
+  return erc20Platform.offSale(platformAddress, orderId);
+}
+
+/** ERC3643 购买：平台合约 placeOrder */
+export function erc3643PlaceOrder(
+  platformAddress: string,
+  orderId: string | number,
+  toAddress: string,
+  amount: string | number,
+) {
+  return erc20Platform.placeOrder(platformAddress, orderId, toAddress, amount);
 }
